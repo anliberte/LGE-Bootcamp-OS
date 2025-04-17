@@ -39,6 +39,24 @@ void App_Read(unsigned int sector, unsigned int size, unsigned int addr)
 	}
 }
 
+void Run_App1(void)
+{
+	Uart_Printf("\nAPP1 RUN\n");
+	SetTransTable(RAM_APP0, (RAM_APP0+SIZE_APP0-1), RAM_APP0, RW_WBWA);
+	SetTransTable(STACK_LIMIT_APP0, STACK_BASE_APP1-1, STACK_LIMIT_APP0, RW_WBWA);
+	CoInvalidateMainTlb();
+	Run_App(RAM_APP0, STACK_BASE_APP0);
+}
+
+void Run_App2(void)
+{
+	Uart_Printf("\nAPP2 RUN\n");
+	SetTransTable(RAM_APP0, (RAM_APP0+SIZE_APP1-1), RAM_APP1, RW_WBWA);
+	SetTransTable(STACK_LIMIT_APP1, STACK_BASE_APP1-1, STACK_LIMIT_APP1, RW_WBWA);
+	CoInvalidateMainTlb();
+	Run_App(RAM_APP0, STACK_BASE_APP1);
+}
+
 void Main(void)
 {
 	CoInitMmuAndL1L2Cache();
@@ -85,29 +103,17 @@ void Main(void)
 	}
 #endif
 
+	// CPU1 부팅
+	Uart_Printf("\nCPU1 부팅 시작\n");
+	exynos_smc(SMC_CMD_CPU1BOOT, 0, 0, 0);
+	
+	// CPU0은 APP1 실행
+	Run_App1();
+	
+	// CPU1은 APP2 실행 (CPU1의 Main 함수에서 실행됨)
+	
 	for(;;)
 	{
-		unsigned char x;
-
-		Uart_Printf("\n실행할 APP을 선택하시오 [1]APP0, [2]APP1 >> ");
-		x = Uart1_Get_Char();
-
-		if(x == '1')
-		{
-			Uart_Printf("\nAPP0 RUN\n", x);
-			SetTransTable(RAM_APP0, (RAM_APP0+SIZE_APP0-1), RAM_APP0, RW_WBWA);
-			SetTransTable(STACK_LIMIT_APP0, STACK_BASE_APP1-1, STACK_LIMIT_APP0, RW_WBWA);
-			CoInvalidateMainTlb();
-			Run_App(RAM_APP0, STACK_BASE_APP0);
-		}
-
-		if(x == '2')
-		{
-			Uart_Printf("\nAPP1 RUN\n", x);
-			SetTransTable(RAM_APP0, (RAM_APP0+SIZE_APP1-1), RAM_APP1, RW_WBWA);
-			SetTransTable(STACK_LIMIT_APP1, STACK_BASE_APP1-1, STACK_LIMIT_APP1, RW_WBWA);
-			CoInvalidateMainTlb();
-			Run_App(RAM_APP0, STACK_BASE_APP1);
-		}
+		// 무한 루프
 	}
 }

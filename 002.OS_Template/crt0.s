@@ -90,6 +90,11 @@ HandlerSVC:
 @--------------------------------------------------
 
 ResetHandler:
+	@ CPU ID 확인
+	mrc		p15, 0, r0, c0, c0, 5
+	and		r0, r0, #0x3
+	cmp		r0, #0x1
+	beq		CPU1_ResetHandler
 
 @--------------------------------------------------
 @ Watchdog Disable
@@ -196,6 +201,34 @@ ResetHandler:
 
 	@ HALT
 
+	b		.
+
+CPU1_ResetHandler:
+	@ CPU1 초기화
+	@ Stack mounting for CPU1
+	msr		cpsr_c, #(IRQ_BIT|FIQ_BIT|IRQ_MODE)
+	ldr		sp, =IRQ_STACK_BASE_CPU1
+
+	msr		cpsr_c, #(IRQ_BIT|FIQ_BIT|FIQ_MODE)
+	ldr		sp, =FIQ_STACK_BASE_CPU1
+
+	msr		cpsr_c, #(IRQ_BIT|FIQ_BIT|UNDEF_MODE)
+	ldr		sp, =UNDEF_STACK_BASE_CPU1
+
+	msr		cpsr_c, #(IRQ_BIT|FIQ_BIT|ABORT_MODE)
+	ldr		sp, =ABORT_STACK_BASE_CPU1
+
+	msr		cpsr_c, #(SVC_MODE)
+	ldr		sp, =SVC_STACK_BASE_CPU1
+
+	@ Set Exception Vector Address for CPU1
+	ldr		r0, =DRAM_START
+	mcr     p15,0,r0,c12,c0,0
+
+	@ Call CPU1_Main
+	bl		CPU1_Main
+
+	@ HALT
 	b		.
 
 	.end

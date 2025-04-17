@@ -37,3 +37,10 @@
 
 	.equ	IRQ_BIT				, 	(1<<7)
 	.equ	FIQ_BIT				,		(1<<6)
+
+// CPU1 Stack Definitions
+#define IRQ_STACK_BASE_CPU1		(0x02060000)
+#define FIQ_STACK_BASE_CPU1		(0x02050000)
+#define UNDEF_STACK_BASE_CPU1	(0x02040000)
+#define ABORT_STACK_BASE_CPU1	(0x02030000)
+#define SVC_STACK_BASE_CPU1		(0x02020000)
