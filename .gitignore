@@ -1,0 +1,9 @@
+*.o
+*.bin
+*.elf
+*.map
+
+**/__dump.txt
+**/__dump_all.txt
+**/.__dump.txt
+**/.__dump_all.txt
