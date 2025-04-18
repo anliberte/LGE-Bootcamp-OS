@@ -229,7 +229,7 @@ void Key3_ISR(void)
 	rEXT_INT40_PEND = 0x1<<3;
 
 	Uart1_Printf("Key3 Pressed\n");
-
+	Timer0_Int_Delay(1, 1000);
 	GIC_Clear_Pending_Clear(0,51);
 	GIC_Write_EOI(0, 51);
 }
@@ -239,7 +239,7 @@ void Key4_ISR(void)
 	rEXT_INT40_PEND = 0x1<<4;
 
 	Uart1_Printf("Key4 Pressed\n");
-
+	Timer0_Int_Delay(0, 1000);
 	GIC_Clear_Pending_Clear(0,52);
 	GIC_Write_EOI(0, 52);
 }
@@ -247,7 +247,7 @@ void Key4_ISR(void)
 void Timer0_ISR(void)
 {
 	static int value = 0;
-
+	Uart1_Printf("Timer0_ISR\n");
 	rTINT_CSTAT |= ((1<<5)|1);
 	GIC_Clear_Pending_Clear(0,69);
 	GIC_Write_EOI(0, 69);

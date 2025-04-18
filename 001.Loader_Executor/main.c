@@ -44,7 +44,13 @@ int Main(void)
 	CoInitMmuAndL1L2Cache();
 	Uart_Init(115200);
 	LED_Init();
-	Key_Poll_Init();
+	Key_ISR_Init();
+    // Key_Poll_Init();
+
+    GIC_Interrupt_Disable(0,51);
+    GIC_Interrupt_Disable(0,52);
+
+    Key_ISR_Enable(1);
 
 	Uart_Printf("\nLoader & Executor\n");
 
@@ -85,7 +91,7 @@ int Main(void)
 		App_Read(SECTOR_APP1, SIZE_APP0, RAM_APP1);
 	}
 #endif
-
+#if 0	
 	for(;;)
 	{
 		Uart_Printf("\nAPP0 RUN\n");
@@ -107,6 +113,8 @@ int Main(void)
 #endif
 
 	}
+#endif
+	for(;;);
 
 	return 0;
 }
